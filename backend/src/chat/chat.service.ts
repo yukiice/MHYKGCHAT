@@ -8,6 +8,7 @@ import { CompletionOptions } from '../adapters/base.adapter';
 @Injectable()
 export class ChatService {
   private adapter: MinMaxAdapter;
+  private minmaxApiKey: string;
 
   constructor(
     private keyService: KeyService,
@@ -15,6 +16,7 @@ export class ChatService {
     private prisma: PrismaService,
   ) {
     this.adapter = new MinMaxAdapter();
+    this.minmaxApiKey = process.env.MINMAX_API_KEY || '';
   }
 
   async streamChat(
@@ -29,9 +31,9 @@ export class ChatService {
     }
 
     const effectiveUserId = userId || validKey.userId;
-    const effectiveApiKey = validKey.key === apiKey ? validKey.key : apiKey;
 
-    this.adapter.setApiKey(effectiveApiKey);
+    // Use MINMAX_API_KEY for actual API call, user's API key is for auth only
+    this.adapter.setApiKey(this.minmaxApiKey);
 
     const options: CompletionOptions = {
       model,
@@ -92,9 +94,9 @@ export class ChatService {
     }
 
     const effectiveUserId = userId || validKey.userId;
-    const effectiveApiKey = validKey.key === apiKey ? validKey.key : apiKey;
 
-    this.adapter.setApiKey(effectiveApiKey);
+    // Use MINMAX_API_KEY for actual API call
+    this.adapter.setApiKey(this.minmaxApiKey);
 
     const options: CompletionOptions = {
       model,
